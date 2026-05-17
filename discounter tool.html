@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Discounting Tool</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+
+        .tool-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .tool-box {
+            width: 420px;
+        }
+
+        .guide-box {
+            width: 320px;
+            border: 2px solid #222;
+            background: #f7f7f7;
+            padding: 12px;
+        }
+
+        .guide-box h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .guide-box ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .guide-box li {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin-bottom: 5px;
+            width: 420px;
+            position: relative;
+            background: #fff;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+
+        input {
+            width: 90%;
+            border: 1px solid #000;
+            font-family: monospace;
+        }
+
+        .res {
+            font-weight: bold;
+            background: #eee;
+        }
+
+        h3 {
+            color: #333;
+            border-bottom: 1px solid #ccc;
+            width: 420px;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .btn-add {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .btn-del {
+            position: absolute;
+            right: 0;
+            top: 0;
+            background: #ff4444;
+            color: white;
+            border: 1px solid #000;
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            line-height: 22px;
+            text-align: center;
+            font-weight: bold;
+            padding: 0;
+        }
+
+        .emp-wrapper {
+            position: relative;
+            border: 2px solid #4CAF50;
+            padding: 10px;
+            width: 425px;
+            background: #f0fff0;
+        }
+
+        .sku-input {
+            margin-bottom: 5px;
+            background: #fff;
+            width: 70%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="tool-row">
+
+    <div class="tool-box">
+        <div style="display: flex; align-items: center; gap: 20px; width: 420px;">
+            <h3 style="margin: 0; border: none;">Employee Flower (1.5x)</h3>
+            <button class="btn-add" onclick="addEmployeeRow()">+ Add Strain</button>
+        </div>
+
+        <div id="employee-list"></div>
+    </div>
+
+    <div class="guide-box">
+        <h4>Flowhub Guide</h4>
+        <ul>
+            <li>Use this for employee flower purchases</li>
+            <li>Enter Cost Per Gram from inventory cost</li>
+            <li>Enter Grams Wanted by employee</li>
+            <li>Enter current Flowhub Pre-Tax Price</li>
+            <li>Tool calculates employee pricing at 1.5x cost</li>
+            <li>Always apply a manual discount in Flowhub to match calculated price</li>
+            <li>Final pre-tax amount should match displayed value by using the calculated discount</li>
+            <li>"Final Cash OTD" shows estimated total after tax</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="tool-row">
+
+    <div class="tool-box">
+        <h3>End of Jar Calculator</h3>
+
+        <table>
+            <tr><td>Cost Per Gram</td><td><input type="number" id="c1" value="0.22" oninput="jar()"></td></tr>
+            <tr><td>Grams Left</td><td><input type="number" id="g1" value="14" oninput="jar()"></td></tr>
+            <tr><td>Flowhub Pre-Tax Price</td><td><input type="number" id="n1" value="10.00" oninput="jar()"></td></tr>
+            <tr class="res"><td>Final Cash (1.8x)</td><td id="r1">$0.00</td></tr>
+            <tr class="res"><td>Flowhub Discount Amt</td><td id="d1">-$0.00</td></tr>
+        </table>
+    </div>
+
+    <div class="guide-box">
+        <h4>Flowhub Guide</h4>
+        <ul>
+            <li>Use this for low remaining flower inventory at the end of a jar</li>
+            <li>Enter inventory Cost Per Gram</li>
+            <li>Enter total grams left in the jar</li>
+            <li>Enter current Flowhub shelf price before tax</li>
+            <li>Tool calculates target cash value using 1.8x cost</li>
+            <li>Always apply the displayed manual discount in Flowhub</li>
+            <li>Used to discount jars at the very end so product still moves</li>
+        </ul>
+    </div>
+
+</div>
+
+<div class="tool-row">
+
+    <div class="tool-box">
+        <h3>Target Price Calculator (Set OTD)</h3>
+
+        <table>
+            <tr><td>Current Pre-Tax Price</td><td><input type="number" id="curr_pre" value="22.00" oninput="targetCalc()"></td></tr>
+            <tr><td>Desired Final Price (OTD)</td><td><input type="number" id="dest_otd" value="15.00" oninput="targetCalc()"></td></tr>
+            <tr class="res"><td>Required Pre-Tax</td><td id="req_pre">$0.00</td></tr>
+            <tr class="res"><td>Flowhub Discount Amt</td><td id="target_disc">-$0.00</td></tr>
+        </table>
+    </div>
+
+    <div class="guide-box">
+        <h4>Flowhub Guide</h4>
+        <ul>
+            <li>Use this when product is advertised at a specific out the door price, but isn't ringing up at that price</li>
+            <li>Mainly useful for finding the discount price needed for EOJ bags and broken deals</li>
+            <li>Enter current item price before tax</li>
+            <li>Enter desired final customer total</li>
+            <li>Tool calculates exact pre-tax amount needed</li>
+            <li>Use displayed discount amount in Flowhub</li>
+            <li>Helpful when you do not know the math needed to hit the exact OTD number</li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+function addEmployeeRow() {
+    const container = document.getElementById('employee-list');
+
+    const wrapper = document.createElement('div');
+
+    wrapper.className = 'emp-wrapper';
+
+    wrapper.innerHTML = `
+        <button class="btn-del" onclick="this.parentElement.remove()">X</button>
+
+        <div style="margin-bottom: 8px;">
+            <small>Optional SKU/Name:</small><br>
+            <input type="text" class="sku-input" placeholder="e.g. SKU #1234">
+        </div>
+
+        <table>
+            <tr><td>Cost Per Gram</td><td><input type="number" class="ec" value="3.00" oninput="emp(this)"></td></tr>
+            <tr><td>Grams Wanted</td><td><input type="number" class="eg" value="3.5" oninput="emp(this)"></td></tr>
+            <tr><td>Flowhub Pre-Tax Price</td><td><input type="number" class="en" value="45.00" oninput="emp(this)"></td></tr>
+            <tr class="res"><td>Set Flowhub Price To (Pre-Tax)</td><td class="epretax">$0.00</td></tr>
+            <tr class="res" style="background: #e1f5fe;"><td>Final Cash OTD (Inc. Tax)</td><td class="etotal">$0.00</td></tr>
+            <tr class="res"><td>Flowhub Discount Amt</td><td class="edisc">-$0.00</td></tr>
+        </table>
+    `;
+
+    container.appendChild(wrapper);
+
+    emp(wrapper.querySelector('.ec'));
+}
+
+function emp(inputEl) {
+    let parent = inputEl.closest('.emp-wrapper');
+
+    let cost = parseFloat(parent.querySelector('.ec').value) || 0;
+    let grams = parseFloat(parent.querySelector('.eg').value) || 0;
+    let normal = parseFloat(parent.querySelector('.en').value) || 0;
+
+    let targetPreTax = (cost * grams * 1.5);
+    let targetWithTax = targetPreTax * 1.2;
+    let discount = normal - targetPreTax;
+
+    parent.querySelector('.epretax').innerText = "$" + targetPreTax.toFixed(2);
+    parent.querySelector('.etotal').innerText = "$" + targetWithTax.toFixed(2);
+    parent.querySelector('.edisc').innerText = "-$" + Math.max(0, discount).toFixed(2);
+}
+
+function jar() {
+    let cost = parseFloat(document.getElementById('c1').value) || 0;
+    let grams = parseFloat(document.getElementById('g1').value) || 0;
+    let normal = parseFloat(document.getElementById('n1').value) || 0;
+
+    let targetCash = Math.round(cost * 1.8 * grams * 1.2);
+    let targetPreTax = targetCash / 1.2;
+    let discount = normal - targetPreTax;
+
+    document.getElementById('r1').innerText = "$" + targetCash.toFixed(2);
+    document.getElementById('d1').innerText = "-$" + Math.max(0, discount).toFixed(2);
+}
+
+function targetCalc() {
+    let currentPreTax = parseFloat(document.getElementById('curr_pre').value) || 0;
+    let targetOTD = parseFloat(document.getElementById('dest_otd').value) || 0;
+
+    let neededPreTax = targetOTD / 1.2;
+    let discountNeeded = currentPreTax - neededPreTax;
+
+    document.getElementById('req_pre').innerText = "$" + neededPreTax.toFixed(2);
+    document.getElementById('target_disc').innerText = "-$" + Math.max(0, discountNeeded).toFixed(2);
+}
+
+addEmployeeRow();
+jar();
+targetCalc();
+</script>
+
+</body>
+</html>
